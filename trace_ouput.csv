@@ -1,0 +1,7 @@
+State,Variable,Value,
+S0,carB,false,
+S0,carA,false,
+S0,emergency,true,
+S1,carB,false,
+S1,carA,false,
+S1,emergency,true,
