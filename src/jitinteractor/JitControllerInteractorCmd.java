@@ -1,92 +1,86 @@
-package traffic;
+package jitinteractor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 import tau.smlab.syntech.controller.jit.BasicJitController;
 
-public class TrafficSimulatorCmd {
+public class JitControllerInteractorCmd {
 
 	public static void main(String args[]) throws Exception {
 
 		Map<String, String> inputs = new HashMap<>();
-		Map<Integer,Map<String, String>> trace = new HashMap<>();
+		Map<Integer, Map<String, String>> trace = new HashMap<>();
         Scanner in = new Scanner(System.in);
         
 		// Instantiate a new controller executor
 		ControllerExecutor executor = new ControllerExecutor(new BasicJitController(), "out/");
 
-		List<String> input_list = Arrays.asList("carA", "carB", "emergency");
+		Set<String> input_list = executor.getEnvVars().keySet();
+		Set<String> output_list = executor.getSysVars().keySet();
 		
 		boolean iniState = true;
 		int state = 0;
 		while (true) {
 			inputs.clear();
 			
+			// Get all inputs from command line
 			addInputs(inputs, in, input_list);
 			
 			// execute controller
-			if (iniState) {
-				executor.initState(inputs);
-				iniState = false;
-			} else {
-				updateExecutor(executor, inputs, in, input_list, trace, state);
-			}
+			iniState = updateExecutor(executor, inputs, in, input_list, trace, state, iniState);
 
-			// read outputs
-			boolean greenA = Boolean.parseBoolean(executor.getCurrValue("greenA"));
-			boolean greenB = Boolean.parseBoolean(executor.getCurrValue("greenB"));
+			// Print all controller outputs
+			for(String output : output_list) {
+				System.out.println(output + ": " + executor.getCurrValue(output));
+			}			
 			
-			if (greenA) {
-				System.out.println("-- carA is allowed to go");
-			} else if (greenB) {
-				System.out.println("-- carB is allowed to go");
-			} else {
-				System.out.println("-- all cars must stop");
-			}
+			// create trace for current state
+			Map<String, String> state_trace = executor.getCurrOutputs();
+			state_trace.putAll(executor.getCurrInputs());
 			
-			Map<String, String> output = executor.getCurrOutputs();
-			for(String key : inputs.keySet()) {
-				//System.out.println("Output: " + key);
-				output.put(key, inputs.get(key));	
-			}	
-			
-			//save trace
-			trace.put(state, output);
+			// Save trace
+			trace.put(state, state_trace);
 			state++;
 		}
 	}
 
-	private static void addInputs(Map<String, String> inputs, Scanner in, List<String> input_list) {
+	private static void addInputs(Map<String, String> inputs, Scanner in, Set<String> input_list) {
 		for(String input : input_list) {
 			boolean bool_input = getInput(in, input);
 			inputs.put(input, Boolean.toString(bool_input));
 		}
 	}
 
-	private static void updateExecutor(ControllerExecutor executor, Map<String, String> inputs, Scanner in, List<String> input_list, Map<Integer, Map<String, String>> trace, Integer state) {
+	private static boolean updateExecutor(ControllerExecutor executor, Map<String, String> inputs, 
+			Scanner in, Set<String> input_list, Map<Integer, Map<String, String>> trace, Integer state, boolean iniState) {	
 		try {
-			executor.updateState(inputs);
+			if(iniState) {
+				executor.initState(inputs);
+			} else {
+				executor.updateState(inputs);
+			}
 		} catch(Exception e) {
 			trace.put(state, inputs);
+			//Save environment assumption violating trace to file:
 			writeTrace(trace, "trace_output.csv");
 			
 			System.out.println(e.getMessage());
 			System.out.println("-- Please repeat inputs.");
 			
 			addInputs(inputs, in, input_list);
-			updateExecutor(executor, inputs, in, input_list, trace, state);
+			updateExecutor(executor, inputs, in, input_list, trace, state, iniState);
 		}
+		return false;
 	}
 
-private static void writeTrace(Map<Integer, Map<String, String>> trace, String file_name) {
+	private static void writeTrace(Map<Integer, Map<String, String>> trace, String file_name) {
 		String csv = "State,Variable,Value,\n";
 		for(Integer key : trace.keySet()) {
 			for(String subKey : trace.get(key).keySet()) {
@@ -103,12 +97,6 @@ private static void writeTrace(Map<Integer, Map<String, String>> trace, String f
 		}
 	}
 
-//	private static void addInputs(Map<String, String> inputs, boolean carA, boolean carB) {
-//		inputs.put("carA", Boolean.toString(carA));
-//		inputs.put("carB", Boolean.toString(carB));
-//		System.out.println(inputs);
-//	}
-	
 	private static boolean getInput(Scanner in, String name) {
 		String line;
 		System.out.println("Is " + name + " present? (Y/n)");
@@ -116,5 +104,4 @@ private static void writeTrace(Map<Integer, Map<String, String>> trace, String f
 		boolean variable = !"n".equals(line);
 		return variable;
 	}
-
 }
