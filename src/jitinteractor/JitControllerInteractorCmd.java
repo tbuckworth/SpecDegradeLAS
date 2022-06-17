@@ -69,7 +69,9 @@ public class JitControllerInteractorCmd {
 		} catch(Exception e) {
 			trace.put(state, inputs);
 			//Save environment assumption violating trace to file:
-			writeTrace(trace, "trace_output.csv");
+//			writeTraceToCSV(trace, "trace_output.csv");
+			writeTraceViolation(trace,"trace_violation.txt");
+			
 			
 			System.out.println(e.getMessage());
 			System.out.println("-- Please repeat inputs.");
@@ -80,7 +82,31 @@ public class JitControllerInteractorCmd {
 		return false;
 	}
 
-	private static void writeTrace(Map<Integer, Map<String, String>> trace, String file_name) {
+	private static void writeTraceViolation(Map<Integer, Map<String, String>> trace, String file_name) {
+		String txt = "Trace Type: Counterexample\n";
+		for(Integer key : trace.keySet()){
+			double state = (key + 11.0) / 10.0;
+			txt += "  -> State: " + state + " <-\n";
+			Map<String, String> variables = trace.get(key);
+			for(String variable : variables.keySet()){
+				String value = variables.get(variable);
+				txt += "    " + variable + " = " + value.toUpperCase() + '\n';
+			}
+		}
+		txt += "  -- Loop starts here\nEnd";
+		writeString(file_name, txt);
+	}
+
+	private static void writeString(String file_name, String txt) {
+		File outputFile = new File(file_name);
+		try (PrintWriter pw = new PrintWriter(outputFile)) {
+			pw.write(txt);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void writeTraceToCSV(Map<Integer, Map<String, String>> trace, String file_name) {
 		String csv = "State,Variable,Value,\n";
 		for(Integer key : trace.keySet()) {
 			for(String subKey : trace.get(key).keySet()) {
@@ -88,13 +114,7 @@ public class JitControllerInteractorCmd {
 				csv += "S" + key.toString() + "," + subKey + "," + value + ",\n";
 			}
 		}
-		File outputFile = new File(file_name);
-		try (PrintWriter pw = new PrintWriter(outputFile)) {
-			pw.write(csv);
-			pw.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		writeString(file_name,csv);
 	}
 
 	private static boolean getInput(Scanner in, String name) {

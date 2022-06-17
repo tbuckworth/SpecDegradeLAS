@@ -7,6 +7,10 @@ env boolean emergency;
 sys boolean greenA;
 sys boolean greenB;
 
+// Initially no cars, no emergency and lights both red
+asm ini !carA & !carB & !emergency;
+gar ini !greenA &!greenB;
+
 asm alwEv carA;
 asm alwEv carB;
 asm alwEv !emergency;
@@ -17,8 +21,13 @@ gar alwEv greenB;
 
 gar alw emergency -> !greenA & !greenB;
 
+//Potentially violatable assumptions:
+
+//Cars never run a red light:
 asm alw carA & !greenA -> next(carA);
 asm alw carB & !greenB -> next(carB);
 
+//Cars always go after a green light:
 asm alw carA & greenA -> next(!carA);
 asm alw carB & greenB -> next(!carB);
+
