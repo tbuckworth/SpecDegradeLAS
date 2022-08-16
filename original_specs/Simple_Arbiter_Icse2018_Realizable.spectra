@@ -1,0 +1,46 @@
+module Simple_Arbiter_Icse2018_Realizable
+
+env boolean r1;
+env boolean r2;
+sys boolean g1;
+sys boolean g2;
+
+guarantee -- guarantee1_1
+	GF(!r2&!g2|r2&g2);
+
+guarantee -- guarantee2_1
+	G(!r1&!g1|r1&g1->!g1&next(!g1)|g1&next(g1));
+
+guarantee -- guarantee3_1
+	!g1;
+
+guarantee -- guarantee4_1
+	GF(!r1&!g1|r1&g1);
+
+guarantee -- guarantee5_1
+	!g2;
+
+guarantee -- guarantee6_1
+	G((next(!g1)|next(!g2)));
+
+guarantee -- guarantee7_1
+	G(!r2&!g2|r2&g2->!g2&next(!g2)|g2&next(g2));
+
+assumption -- assumption1_1
+	!r1;
+
+assumption -- assumption2_1
+	!r2;
+
+assumption -- assumption3_1
+	GF(((!r1|!g1)));
+
+assumption -- assumption4_1
+	G(!r1&g1|r1&!g1->!r1&next(!r1)|r1&next(r1));
+
+assumption -- assumption5_1
+	GF(((!r2|!g2)));
+
+assumption -- assumption6_1
+	G(!r2&g2|r2&!g2->!r2&next(!r2)|r2&next(r2));
+

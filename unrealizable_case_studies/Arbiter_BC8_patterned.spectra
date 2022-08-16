@@ -1,0 +1,42 @@
+module Arbiter
+
+env boolean a;
+env boolean r1;
+env boolean r2;
+sys boolean g1;
+sys boolean g2;
+
+//spec: -g='G (r1 -> F g1)' -g='G (r2 -> F g2)' -g='G (!a -> (!g1 && !g2))' -ins='a,r1,r2' -outs='g1,g2'
+
+guarantee -- guarantee1_1
+	pRespondsToS(r1,g1);
+
+guarantee -- guarantee2_1
+	pRespondsToS(r2,g2);
+
+guarantee -- guarantee3_1
+	G(!a->!g1&!g2);
+
+//BC: (F((G(r1) & G(!g1))) | F((G(!a) & G((r2 | g1)))))
+
+assumption -- negated_bc1_1
+	GF(!r1|g1);
+
+assumption -- negated_bc2_1
+	GF(a|!r2&!g1);
+
+pattern pRespondsToS(s, p) {
+  var { S0, S1} state;
+
+  // initial assignments: initial state
+  ini state=S0;
+
+  // safety this and next state
+  alw ((state=S0 & ((!s) | (s & p)) & next(state=S0)) |
+  (state=S0 & (s & !p) & next(state=S1)) |
+  (state=S1 & (p) & next(state=S0)) |
+  (state=S1 & (!p) & next(state=S1)));
+
+  // equivalence of satisfaction
+  alwEv (state=S0);
+}

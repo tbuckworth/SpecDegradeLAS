@@ -1,0 +1,53 @@
+module Simple_Arbiter_V1
+
+env boolean r_0;
+env boolean r_1;
+sys boolean g_0;
+sys boolean g_1;
+
+// spec: 	-g="G((! (g_0)) || (! (g_1)))" 
+// 			-g="G(((r_0) && (X (r_1))) -> (X ((g_0) && (g_1))))" 
+// 			-g="(G ((r_0) -> (F (g_0))))" 
+// 			-g="(G ((r_1) -> (F (g_1))))" 
+// 			-ins='r_0,r_1' 
+// 			-outs='g_0,g_1'
+
+
+guarantee -- guarantee1_1
+	G(!g_0|!g_1);
+
+guarantee -- guarantee2_1
+	G(r_0&next(r_1)->next(g_0&g_1));
+
+guarantee -- guarantee3_1
+	pRespondsToS(r_0,g_0);
+
+guarantee -- guarantee4_1
+	pRespondsToS(r_1,g_1);
+
+//BC: (F((r_0 & G(g_1))) | F((G(r_1) & G(!g_1))) | F((r_0 & !g_1 & X(r_1))))
+
+assumption -- negated_bc1_1
+	pRespondsToS(r_0,!g_1);
+
+assumption -- negated_bc2_1
+	GF(!r_1|g_1);
+
+assumption -- negated_bc3_1
+	G(r_0&!g_1->next(!r_1));
+
+pattern pRespondsToS(s, p) {
+  var { S0, S1} state;
+
+  // initial assignments: initial state
+  ini state=S0;
+
+  // safety this and next state
+  alw ((state=S0 & ((!s) | (s & p)) & next(state=S0)) |
+  (state=S0 & (s & !p) & next(state=S1)) |
+  (state=S1 & (p) & next(state=S0)) |
+  (state=S1 & (!p) & next(state=S1)));
+
+  // equivalence of satisfaction
+  alwEv (state=S0);
+}

@@ -1,0 +1,49 @@
+module Simple_Arbiter_Icse2018_Realizable
+
+env boolean r1;
+env boolean r2;
+sys boolean g1;
+sys boolean g2;
+
+guarantee -- guarantee1_1
+	GF(r2=false&g2=false|r2=true&g2=true);
+
+guarantee -- guarantee2_1
+	G(r1=false&g1=false|r1=true&g1=true->g1=false&next(g1=false)|g1=true&next(g1=true));
+
+guarantee -- guarantee3_1
+	g1=false;
+
+guarantee -- guarantee4_1
+	GF(r1=false&g1=false|r1=true&g1=true);
+
+guarantee -- guarantee5_1
+	g2=false;
+
+guarantee -- guarantee6_1
+	G((next(g1=false)|next(g2=false)));
+
+guarantee -- guarantee7_1
+	G(r2=false&g2=false|r2=true&g2=true->g2=false&next(g2=false)|g2=true&next(g2=true));
+
+assumption -- assumption1_1
+	r1=false;
+
+assumption -- assumption2_1
+	r2=false;
+
+assumption -- assumption3_1
+	GF(((r1=false|g1=false)));
+
+assumption -- assumption4_1
+	G(r1=false&g1=true|r1=true&g1=false->r1=false&next(r1=false)|r1=true&next(r1=true));
+
+assumption -- assumption5_1
+	GF(((r2=false|g2=false)));
+
+assumption -- assumption6_1
+	G(r2=false&g2=true|r2=true&g2=false->r2=false&next(r2=false)|r2=true&next(r2=true));
+
+assumption -- negated_bc1_1
+	G(r1=false);
+

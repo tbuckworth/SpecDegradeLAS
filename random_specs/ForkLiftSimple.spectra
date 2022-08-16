@@ -1,0 +1,39 @@
+module ForkLiftSimple
+
+env boolean sensor_clear;
+env boolean cargo_clear;
+env boolean at_station;
+
+sys boolean backing;
+sys boolean stopping;
+sys boolean turning;
+sys boolean forwarding;
+
+sys boolean dropping;
+sys boolean lifting;
+
+assumption -- backing_clears_sensors
+	G(backing -> F(sensor_clear & cargo_clear));
+	
+assumption -- station_fixed_when_stopping1
+	G(stopping & at_station -> next(at_station));
+
+assumption -- station_fixed_when_stopping2
+	G(stopping & !at_station -> next(!at_station));
+
+guarantee -- leave_station_to_deliver
+	G(lifting -> F(!at_station));
+
+guarantee -- leave_station_to_deliver
+	G(!atStation -> F(at_station));
+
+	
+guarantee -- no_dropping_between_stations
+	G(!at_station -> !dropping);
+
+guarantee -- no_dropping_between_stations
+	G(lifting -> at_station);
+	
+	
+
+	

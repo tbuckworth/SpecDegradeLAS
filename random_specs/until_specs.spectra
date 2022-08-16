@@ -1,0 +1,69 @@
+module Prioritizedarbiter
+
+sys boolean a;
+sys boolean b;
+sys boolean c;
+
+//guarantee -- guarantee1_1
+//	G(a -> b U c);
+	
+gar aImplies_bUntil_c(a,b,c);
+
+gar !a & !b & !c;
+
+
+gar alwEv a & b & !c & next(!a & b & !c);
+
+
+
+pattern aImplies_bUntil_c(a, b, c) {
+  var { S0, S1, S2} state;
+
+  // initial assignments: initial state
+  ini state=S1;
+
+  // safety this and next state
+  alw (
+		(state=S1 & (!a | c) & next(state=S1)) |
+		(state=S1 & (a & b & !c) & next(state=S0)) |
+		(state=S1 & (a & !b & !c) & next(state=S2)) |
+		(state=S0 & (b & !c) & next(state=S0)) |
+		(state=S0 & (!b & !c) & next(state=S2)) |
+		(state=S0 & (c) & next(state=S1)) |
+		(state=S2 & next(state=S2))  
+	  );
+
+  // equivalence of satisfaction
+  alwEv (state=S0);
+  alwEv (state=S1);
+}
+
+
+
+
+//This is what Jan advised I think, but doesn't work:
+
+pattern aImplies_bUntil_c_ALT(a, b, c) {
+  var { S0, S1, S2} state;
+  var boolean acc;
+  
+  // initial assignments: initial state
+  ini state=S1;
+
+  // safety this and next state
+  alw (
+		(state=S1 & ((!a | c) & acc) & next(state=S1)) |
+		(state=S1 & (a & b & !c & !acc) & next(state=S0)) |
+		(state=S1 & (a & !b & !c & !acc) & next(state=S2)) |
+		(state=S0 & (b & !c & !acc) & next(state=S0)) |
+		(state=S0 & (!b & !c & !acc) & next(state=S2)) |
+		(state=S0 & (c & acc) & next(state=S1)) |
+		(state=S2 & !acc & next(state=S2))  
+	  );
+//  alw state != S2;
+
+  // equivalence of satisfaction
+  alwEv acc;
+}
+	
+	

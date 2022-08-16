@@ -1,0 +1,51 @@
+module Round_Robin
+
+env boolean r_0;
+env boolean r_1;
+env boolean r_2;
+sys boolean g_0;
+sys boolean g_1;
+sys boolean g_2;
+
+guarantee -- guarantee1_1
+	G(PREV(!g_0)&PREV(true|true&!g_1&r_0&next(r_1))->next(g_0&g_1));
+
+guarantee -- guarantee2_1
+	pRespondsToS(r_0,g_0);
+
+guarantee -- guarantee3_1
+	pRespondsToS(r_1,g_1);
+
+assumption -- assumption1_1
+	G(r_0&!g_0->next(r_0));
+
+assumption -- assumption2_1
+	GF(!r_1&g_1);
+
+assumption -- assumption3_1
+	G(!r_0&g_0->next(!r_0));
+
+assumption -- assumption4_1
+	G(!r_1&g_1->next(!r_1));
+
+assumption -- assumption5_1
+	GF(!r_0&g_0);
+
+assumption -- assumption6_1
+	G(r_1&!g_1->next(r_1));
+
+pattern pRespondsToS(s, p) {
+  var { S0, S1} state;
+
+  // initial assignments: initial state
+  ini state=S0;
+
+  // safety this and next state
+  alw ((state=S0 & ((!s) | (s & p)) & next(state=S0)) |
+  (state=S0 & (s & !p) & next(state=S1)) |
+  (state=S1 & (p) & next(state=S0)) |
+  (state=S1 & (!p) & next(state=S1)));
+
+  // equivalence of satisfaction
+  alwEv (state=S0);
+}

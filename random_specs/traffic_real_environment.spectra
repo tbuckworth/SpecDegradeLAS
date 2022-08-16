@@ -1,0 +1,34 @@
+spec TrafficE2
+
+env boolean carA;
+env boolean carB;
+env boolean emergency;
+
+sys boolean greenA;
+sys boolean greenB;
+
+// Initially no cars, no emergency and lights both red
+asm ini !carA & !carB & !emergency;
+gar ini !greenA & !greenB;
+
+asm alwEv carA;
+asm alwEv carB;
+asm alwEv !emergency;
+
+//Cars never run a red light:
+asm alw carA & !greenA & !emergency -> next(carA);
+asm alw carB & !greenB & !emergency -> next(carB);
+
+//Cars always go after a green light:
+asm alw carA & greenA & !emergency -> next(!carA);
+asm alw carB & greenB & !emergency -> next(!carB);
+
+//system tries to visit every state
+gar alwEv greenA & greenB;
+gar alwEv greenA & !greenB;
+gar alwEv !greenA & greenB;
+gar alwEv !greenA & !greenB;
+
+
+
+

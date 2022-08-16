@@ -1,0 +1,23 @@
+module Detector
+
+env boolean r_0;
+env boolean r_1;
+sys boolean g;
+
+guarantee -- guarantee1
+	GF(r_0)
+	
+guarantee -- guarantee1b
+	GF(r_1)<->GF(g);
+
+guarantee
+	(!r_1 S true) | GF(g);
+	
+guarantee
+	GF(r_1) | FG(!g);
+	
+	
+
+guarantee -- guarantee2
+	G(r_0&r_1->G(!g));
+

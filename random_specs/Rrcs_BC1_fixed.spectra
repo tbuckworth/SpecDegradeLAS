@@ -1,0 +1,31 @@
+module Rrcs
+
+env boolean ta;
+env boolean tc;
+env boolean ca;
+env boolean cc;
+sys boolean go;
+
+guarantee -- guarantee1_1
+	G(tc=true->ta=false|cc=false);
+
+guarantee -- guarantee2_1
+	G(ta=true->go=false);
+
+assumption -- assumption1_1
+	G(ta=true->next(tc=true));
+
+assumption -- assumption1_2
+	G(ta=false->next(tc=false));
+
+assumption -- assumption2_1
+	G(ca=false|go=false->next(cc=false));
+
+assumption -- negated_bc1_1
+    G(ta=true-> tc=false|cc=false);
+
+assumption -- negated_bc2_1
+	G(next(ta=false|go=false));
+
+
+

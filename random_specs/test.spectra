@@ -1,0 +1,14 @@
+module Test
+
+env boolean switch;
+
+sys boolean powercut;
+
+gar
+	powercut;
+
+
+
+gar G switch -> next(powercut);
+
+gar GF switch -> powercut;

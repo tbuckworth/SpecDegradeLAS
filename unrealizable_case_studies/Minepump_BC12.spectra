@@ -1,0 +1,23 @@
+module Minepump
+
+env boolean h;
+env boolean m;
+sys boolean p;
+
+//spec: -ins='h,m' -outs='p' -d='G((p && X(p)) -> X(X(! h)))' -g='G(h -> X(p))' -g='G(m -> X(! p))'
+
+
+guarantee -- guarantee1_1
+	G(h->next(p));
+
+guarantee -- guarantee2_1
+	G(m->next(!p));
+
+assumption -- assumption1_1
+	G(PREV(p)&p->next(!h));
+
+//BC: F(G(((m & p) | X(h))))
+
+assumption -- negated_bc1_1
+	GF((!m|!p)&next(!h));
+

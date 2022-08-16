@@ -1,9 +1,13 @@
 package jitinteractor;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 
 import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDVarSet;
 import tau.smlab.syntech.controller.Controller;
 import tau.smlab.syntech.controller.executor.ControllerExecutor;
 import tau.smlab.syntech.controller.jit.BasicJitController;
@@ -15,10 +19,38 @@ public class CustomControllerExecutor extends ControllerExecutor {
 		super(controller, folder);
 	}
 	
-//	public static void main(String[] args) throws Exception {
-//		CustomControllerExecutor executor = new CustomControllerExecutor(new BasicJitController(), "out/");
-//
-//	}
+	public static void OLD_main(String[] args) throws Exception {
+		Map<String, String> inputs = new HashMap<>();
+        Scanner in = new Scanner(System.in);
+		
+		CustomControllerExecutor executor = new CustomControllerExecutor(new BasicJitController(), "out/");
+		
+		Set<String> input_list = executor.getEnvVars().keySet();
+		//Set<String> output_list = executor.getSysVars().keySet();
+		// Get all inputs from command line
+		addInputs(inputs, in, input_list);
+		
+		// execute controller
+		executor.initState(inputs);
+		while(true) {
+			addInputs(inputs, in, input_list);
+			executor.updateStateCustom(inputs);
+		}
+	}
+	private static void addInputs(Map<String, String> inputs, Scanner in, Set<String> input_list) {
+		inputs.clear();
+		for(String input : input_list) {
+			boolean bool_input = getInput(in, input);
+			inputs.put(input, Boolean.toString(bool_input));
+		}
+	}
+	private static boolean getInput(Scanner in, String name) {
+		String line;
+		System.out.println("Is " + name + " present? (Y/n)");
+		line = in.nextLine();
+		boolean variable = !"n".equals(line);
+		return variable;
+	}
 	
 	
 	public void updateStateCustom(Map<String, String> inputs) throws IllegalStateException, IllegalArgumentException {
@@ -33,15 +65,28 @@ public class CustomControllerExecutor extends ControllerExecutor {
 		currAndTrans.andWith(currentState.id());
 		
 		//Titus adding:
+		System.out.println("bdd dot before:");
+		currAndTrans.printDot();
+		System.out.println("bdd set before:");
 		currAndTrans.printSet();
-		currAndTrans.toVarSet();
-		currAndTrans.var();
+		
+//		BDDVarSet variableSet = currAndTrans.toVarSet();
+//		System.out.println(variableSet.toString());
+//		currAndTrans.var();
+//		
+		
 		//if BDD is zero, how can we see why it is zero?
 		
 		if (currAndTrans.isZero()) {
 			throw new IllegalStateException("The environment is in a deadlock state. There is no possible safe input for the environment");
 		}
 		currAndTrans.andWith(Env.prime(inputsBDD));
+		
+		System.out.println("bdd dot after:");
+		currAndTrans.printDot();
+		System.out.println("bdd set after:");
+		currAndTrans.printSet();
+		
 		if (currAndTrans.isZero()) {
 			throw new IllegalArgumentException("The inputs are a safety violation for the environment");
 		}

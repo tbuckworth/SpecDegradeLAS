@@ -1,0 +1,56 @@
+module Tcp
+
+env boolean delivered;
+env boolean ack;
+sys boolean send;
+
+//assumption -- assumption1
+//	G(send->!ack U delivered);
+//
+//assumption -- assumption2
+//	G(delivered-> ((!send) until (ack)));
+
+assumption -- re-written
+	pImpliesQuntilR(delivered, !send, ack);
+	
+//assumption -- assumption1
+//	G(send-> ack SINCE !delivered);
+//
+//assumption -- assumption2
+//	G(delivered-> send SINCE !ack);
+	
+pattern pImpliesQuntilR(p, q, r) {
+	var { S0, S1, S2} state;
+	
+	state = S0;
+	
+	alw (
+		(state=S0 & !p & next(state=S0)) |
+		(state=S0 & p & q & !r & next(state=S1)) |
+		(state=S1 & q & !r & next(state=S1)) |
+		(state=S1 & r & next(state=S0))
+	);
+	
+	alwEv (state=S0 | state=S2);
+	
+}
+	
+	
+pattern pHolds_afterQuntilR(p, q, r) {
+  var { S0, S1, S2} state;
+
+  -- initial assignments: initial state
+  state=S0;
+
+  -- safety this and next state
+  alw ((state=S0 & ((!q & !r) | (r)) & next(state=S0)) |
+  (state=S0 & (q & !p & !r) & next(state=S1)) |
+  (state=S0 & (q & p & !r) & next(state=S2)) |
+  (state=S1 & TRUE & next(state=S1)) |
+  (state=S2 & (r) & next(state=S0)) |
+  (state=S2 & (!p & !r) & next(state=S1)) |
+  (state=S2 & (p & !r) & next(state=S2)));
+
+  -- equivalence of satisfaction
+  alwEv (state=S0 | state=S2);
+}

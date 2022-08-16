@@ -20,7 +20,7 @@ public class JitControllerInteractorCmd {
         Scanner in = new Scanner(System.in);
         
 		// Instantiate a new controller executor
-		ControllerExecutor executor = new ControllerExecutor(new BasicJitController(), "out/");
+		ControllerExecutor executor = new ControllerExecutor(new BasicJitController(), "real_spec/out/");
 
 		Set<String> input_list = executor.getEnvVars().keySet();
 		Set<String> output_list = executor.getSysVars().keySet();

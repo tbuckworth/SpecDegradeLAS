@@ -1,0 +1,32 @@
+module Retractionpattern1
+
+env boolean p;
+env boolean q;
+
+guarantee -- guarantee1
+	pRespondsToS(p,q);
+
+guarantee -- guarantee2
+	G(q->p);
+
+assumption -- negated_bc1
+	G(p|!q);
+
+assumption -- negated_bc2
+	pRespondsToS(next(p,q));
+
+pattern pRespondsToS(s, p) {
+  var { S0, S1} state;
+
+  // initial assignments: initial state
+  ini state=S0;
+
+  // safety this and next state
+  alw ((state=S0 & ((!s) | (s & p)) & next(state=S0)) |
+  (state=S0 & (s & !p) & next(state=S1)) |
+  (state=S1 & (p) & next(state=S0)) |
+  (state=S1 & (!p) & next(state=S1)));
+
+  // equivalence of satisfaction
+  alwEv (state=S0);
+}

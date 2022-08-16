@@ -1,0 +1,57 @@
+spec TrafficE2
+
+env boolean carA;
+env boolean carB;
+env boolean emergency;
+env boolean police;
+
+sys boolean greenA;
+sys boolean greenB;
+
+// Initially no cars, no emergency and lights both red
+asm ini !carA & !carB & emergency;
+gar ini !greenA &!greenB;
+
+asm alwEv carA;
+asm alwEv carB;
+//asm alwEv !emergency;
+asm alwEv police;
+
+
+gar alw greenA -> !greenB;
+gar alw greenB -> !greenA;
+
+
+gar alwEv greenA;
+gar alwEv greenB;
+
+//gar alw emergency -> !greenA & !greenB;
+
+//Potentially violatable assumptions:
+
+//Cars never run a red light:
+asm alw carA & !greenA & carB -> next(carA);
+asm alw carA & !greenA & greenB -> next(carA);
+
+asm alw carB & !greenB -> next(carB);
+
+//Cars always go after a green light:
+asm -- original:
+	alw carA & greenA -> next(!carA);
+asm -- weakened:
+	alw carA & greenA & !emergency -> next(!carA);
+
+asm alw carB & greenB -> next(!carB);
+
+asm -- strengthened:
+	alw carA & police -> next(!carA);
+
+
+gar alwEv !carA;
+
+
+
+
+
+
+

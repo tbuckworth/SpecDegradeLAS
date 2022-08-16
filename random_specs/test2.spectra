@@ -1,0 +1,18 @@
+module Ltl2Dba27
+
+env boolean p;
+sys boolean acc;
+
+assumption -- once
+	GF ONCE p;
+	
+assumption -- once equiv
+	GF TRUE SINCE p;
+	
+assumption
+	GF HISTORICALLY p;
+
+assumption
+	G acc SINCE(p);
+
+	// SINCE is dual of UNTIL

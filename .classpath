@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib/jmock-2.8.3.jar"/>
 	<classpathentry kind="lib" path="lib/jmock-junit4-2.8.3.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="ctd.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

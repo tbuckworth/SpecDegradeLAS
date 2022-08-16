@@ -1,0 +1,27 @@
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+1    [main] ERROR xt.validation.ResourceValidatorImpl  - The string resource '_UI_DiagnosticRoot_diagnostic' could not be located
+java.util.MissingResourceException: The string resource '_UI_DiagnosticRoot_diagnostic' could not be located
+        at org.eclipse.emf.common.util.DelegatingResourceLocator.delegatedGetString(DelegatingResourceLocator.java:586)
+        at org.eclipse.emf.common.util.DelegatingResourceLocator.getString(DelegatingResourceLocator.java:450)
+        at org.eclipse.emf.common.util.DelegatingResourceLocator.getString(DelegatingResourceLocator.java:605)
+        at org.eclipse.emf.common.util.DelegatingResourceLocator.getString(DelegatingResourceLocator.java:597)
+        at org.eclipse.emf.ecore.util.Diagnostician.createDefaultDiagnostic(Diagnostician.java:110)
+        at org.eclipse.emf.ecore.util.Diagnostician.validate(Diagnostician.java:139)
+        at org.eclipse.xtext.validation.ResourceValidatorImpl.validate(ResourceValidatorImpl.java:147)
+        at org.eclipse.xtext.validation.ResourceValidatorImpl.validate(ResourceValidatorImpl.java:125)
+        at org.eclipse.xtext.validation.ResourceValidatorImpl.validate(ResourceValidatorImpl.java:91)
+        at tau.smlab.syntech.spectragameinput.SpectraInputProviderNoIDE.getSpectraModel(SpectraInputProviderNoIDE.java:134)
+        at tau.smlab.syntech.spectragameinput.SpectraInputProviderNoIDE.getGameInput(SpectraInputProviderNoIDE.java:78)
+        at tau.smlab.syntech.Spectra.cli.SpectraCliTool.main(SpectraCliTool.java:102)
+GR1GameImplC.checkRealizability: start
+GR1GameImplC.checkRealizability: end
+Nodes num: 11
+Nodes table size: 1022
+Result: Specification is unrealizable
+extract strategy - Start
+Error: Could not generate concrete counter-strategy
+tau.smlab.syntech.games.GamesStrategyException: BDD of winning states invalid.
+        at tau.smlab.syntech.games.rabin.RabinConcreteControllerConstruction.calculateConcreteController(RabinConcreteControllerConstruction.java:35)
+        at tau.smlab.syntech.games.rabin.RabinConcreteControllerConstruction.calculateConcreteController(RabinConcreteControllerConstruction.java:28)
+        at tau.smlab.syntech.Spectra.cli.SpectraCliTool.main(SpectraCliTool.java:217)

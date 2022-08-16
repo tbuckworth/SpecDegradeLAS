@@ -1,0 +1,29 @@
+module Rrcs
+
+env boolean ta;
+env boolean tc;
+env boolean ca;
+env boolean cc;
+sys boolean go;
+
+guarantee -- guarantee1_1
+	G(tc->!cc);
+
+guarantee -- guarantee2_1
+	G(ta->!go);
+
+assumption -- assumption1_1
+	G(ta->next(tc));
+
+assumption -- assumption1_2
+	G((tc)->PREV(ta));
+
+assumption -- assumption2_1
+	G((cc)->PREV(ca&go));
+
+assumption -- negated_bc1_1
+	G(!tc|!cc);
+
+assumption -- negated_bc2_1
+	G(next(!ta|!go));
+
